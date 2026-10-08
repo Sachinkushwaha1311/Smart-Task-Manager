@@ -26,6 +26,32 @@ function saveDarkMode(){
     }
 }
 
+// Dark Mode // 
+
+darkModeBtn.addEventListener("click", function(){
+    document.body.classList.toggle("dark");
+    if(document.body.classList.contains("dark")){
+        darkModeBtn.textContent = "☀️";
+    } else{
+        darkModeBtn.textContent = "🌙";
+    }
+    saveDarkMode();
+});
+
+
+// Load Dark Mode //
+
+function loadDarkMode(){
+    let savedDarkMode = localStorage.getItem("darkMode");
+    if(savedDarkMode === "true"){
+        document.body.classList.add("dark");
+        darkModeBtn.textContent = "☀️";
+    } else{
+        document.body.classList.remove("dark");
+        darkModeBtn.textContent = "🌙";
+    }
+}
+
 // Load Tasks //
 
 function loadTasks(){
@@ -36,16 +62,7 @@ function loadTasks(){
     displayTasks();
 }
 
-// Dark Mode // 
 
-darkModeBtn.addEventListener("click", function(){
-    document.body.classList.toggle("dark");
-    if(document.body.classList.contains("dark")){
-        darkModeBtn.textContent = "☀️";
-    } else{
-        darkModeBtn.textContent = "🌙";
-    }
-});
 
 function showTaskMessage(message, type = "success") {
     taskMessage.textContent = message;
@@ -233,3 +250,4 @@ function updateStatistics() {
 }
 
 loadTasks();
+loadDarkMode();

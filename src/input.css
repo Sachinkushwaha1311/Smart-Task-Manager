@@ -22,17 +22,19 @@ body.dark nav h1{
     color: white;
 }
 
-body.dark main h2{
+body.dark main .bg-white{
+    background-color: #1f2937;
+    border-color: #374151;
+}
+
+body.dark main h2,
+body.dark main #totalTasks,
+body.dark #emptyState h3{
     color: white;
 }
 
 body.dark main p{
     color: #d1d5db;
-}
-
-body.dark section{
-    background-color: #1f2937;
-    border-color: #374151;
 }
 
 body.dark input,
@@ -46,17 +48,17 @@ body.dark input::placeholder{
     color: #d1d5db;
 }
 
-body.dark .task-card{
-    background-color: #1f2937;
-    border-color: #374151;
+body.dark .task-card h3.text-gray-400{
+    color: #9ca3af;
 }
 
 body.dark .task-card h3{
     color: white;
 }
 
-body.dark .task-card p{
-    color: #d1d5db;
+body.dark #darkModeBtn{
+    background-color: #1f2937;
+    color: white;
 }
 
 button{
