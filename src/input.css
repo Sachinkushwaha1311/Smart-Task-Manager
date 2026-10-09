@@ -61,6 +61,15 @@ body.dark #darkModeBtn{
     color: white;
 }
 
+body.dark #editSection{
+    background-color: #1f2937;
+    border-color: #374151;
+}
+
+body.dark #editSection h2{
+    color: white;
+}
+
 button{
     transition: all 0.2s ease;
 }
@@ -72,4 +81,22 @@ button{
 .task-card:hover{
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+#saveEditBtn{
+    background-color: #16a34a;
+    color: white;
+}
+
+#saveEditBtn:hover{
+    background-color: #15802d;
+}
+
+#cancelEditBtn{
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+#cancelEditBtn:hover{
+    background-color: #d1d5db;
 }

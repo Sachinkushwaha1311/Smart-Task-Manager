@@ -8,31 +8,38 @@ let searchInput = document.getElementById("searchInput");
 let filterInput = document.getElementById("filterInput");
 let darkModeBtn = document.getElementById("darkModeBtn");
 
+let editSection = document.getElementById("editSection");
+let editTaskInput = document.getElementById("editTaskInput");
+let editPriorityInput = document.getElementById("editPriorityInput");
+let saveEditBtn = document.getElementById("saveEditBtn");
+let cancelEditBtn = document.getElementById("cancelEditBtn");
+
 let tasks = [];
+let editingTaskId = null;
 
 /* Save Task */
 
-function saveTasks(){
+function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
 // Save Dark Mode //
 
-function saveDarkMode(){
-    if(document.body.classList.contains("dark")){
+function saveDarkMode() {
+    if (document.body.classList.contains("dark")) {
         localStorage.setItem("darkMode", "true");
-    } else{
+    } else {
         localStorage.setItem("darkMode", "false");
     }
 }
 
 // Dark Mode // 
 
-darkModeBtn.addEventListener("click", function(){
+darkModeBtn.addEventListener("click", function () {
     document.body.classList.toggle("dark");
-    if(document.body.classList.contains("dark")){
+    if (document.body.classList.contains("dark")) {
         darkModeBtn.textContent = "☀️";
-    } else{
+    } else {
         darkModeBtn.textContent = "🌙";
     }
     saveDarkMode();
@@ -41,12 +48,12 @@ darkModeBtn.addEventListener("click", function(){
 
 // Load Dark Mode //
 
-function loadDarkMode(){
+function loadDarkMode() {
     let savedDarkMode = localStorage.getItem("darkMode");
-    if(savedDarkMode === "true"){
+    if (savedDarkMode === "true") {
         document.body.classList.add("dark");
         darkModeBtn.textContent = "☀️";
-    } else{
+    } else {
         document.body.classList.remove("dark");
         darkModeBtn.textContent = "🌙";
     }
@@ -54,9 +61,9 @@ function loadDarkMode(){
 
 // Load Tasks //
 
-function loadTasks(){
+function loadTasks() {
     let savedTasks = localStorage.getItem("tasks");
-    if(savedTasks !== null){
+    if (savedTasks !== null) {
         tasks = JSON.parse(savedTasks);
     }
     displayTasks();
@@ -133,37 +140,43 @@ function displayTasks() {
     filteredTasks.forEach(function (task) {
         let taskHTML = `
         <div class="task-card bg-white rounded-xl border border-gray-200 p-5 mb-4">
-            <div class="flex items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <!-- LEFT SIDE -->
+                <div class="flex items-center gap-2 flex-wrap">
+
                     <input type="checkbox" class="task-checkbox w-5 h-5 cursor-pointer" data-id="${task.id}" ${task.completed ? "checked" : ""}>
+                        <div>
+                            <h3 class="font-semibold break-word ${task.completed? "line-through text-gray-400" : "text-gray-800"}">
+                                ${task.name}
+                            </h3>
 
-                    <div>
-                        <h3 class="font-semibold ${task.completed ? "line-through text-gray-400" : "text-gray-800"}">
-                            ${task.name}
-                        </h3>
-
-                        <p class="text-sm text-gray-500">
-                            ${task.priority} Priority
-                        </p>
-                    </div>
+                            <p class="text-sm text-gray-500 mt-1">
+                                ${task.completed ? "Completed" : task.priority + "Priority"}
+                            </p>
+                        </div>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <span class="text-sm px-3 py-1 rounded-full ${task.priority === "High" ? "bg-red-100 text-red-600" : task.priority === "Medium" ? "bg-yellow-100 text-yellow-600" : "bg-green-100 text-green-600"}">
+                <!-- RIGHT SIDE -->
+                <div class="flex items-center gap-2">
+
+                    <!-- PRIORITY -->
+                    <span class="text-sm px-3 py-1 rounded-full ${task.completed ? "bg-gray-100 text-gray-500" : task.priority === "High" ? "bg-red-100 text-red-600" : task.priority === "Medium" ? "bg-yellow-100 text-yellow-600" : "bg-green-100 text-green-600"}">
                         ${task.priority}
                     </span>
 
-                    <button type="button" class="edit-btn text-blue-500 hover:text-blue-700" data-id="${task.id}">
+                    <!-- EDIT -->
+                    <button class="edit-btn w-9 h-9 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600" data-id="${task.id}" type="button">
                         ✏️
                     </button>
 
-                    <button type="button" class="delete-btn text-red-500 hover:text-red-700" data-id="${task.id}">
+                    <!-- DELETE -->
+                    <button class="delete-btn w-9 h-9 rounded-lg bg-red-50 hover:bg-red-100 text-red-600" data-id="${task.id}" type="button">
                         🗑️
                     </button>
                 </div>
             </div>
         </div>
-        `;
+    `;
 
         taskList.innerHTML += taskHTML;
     });
@@ -187,7 +200,7 @@ function addCheckboxEvents() {
                 saveTasks();
                 displayTasks();
             });
-            
+
         });
     });
 }
@@ -210,29 +223,56 @@ function addDeleteEvents() {
 
 /* Edit Task */
 
-function addEditEvents(){
+function addEditEvents() {
     let editButtons = document.querySelectorAll('.edit-btn');
 
-    editButtons.forEach(function(button){
-        button.addEventListener("click", function(){
+    editButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
             let taskId = Number(button.dataset.id);
-            let taskToEdit = tasks.find(function(task){
-                return task.id === taskId;
+            tasks.forEach(function (task) {
+                if (task.id === taskId) {
+                    editingTaskId = task.id;
+                    editTaskInput.value = task.name;
+                    editPriorityInput.value = task.priority;
+                    editSection.classList.remove("hidden");
+                    editTaskInput.focus();
+                }
             });
-
-            if (!taskToEdit) return;
-
-            let newTaskName = prompt("Edit task name:", taskToEdit.name);
-            let trimmedTaskName = newTaskName ? newTaskName.trim() : "";
-
-            if (trimmedTaskName !== "") {
-                taskToEdit.name = trimmedTaskName;
-            }
-            saveTasks();
-            displayTasks();
         });
     });
 }
+
+// Save Edited Task //
+
+saveEditBtn.addEventListener("click", function () {
+    let newTaskName = editTaskInput.value.trim;
+    let newPriority = editPriorityInput.value;
+
+    if (newTaskName === "") {
+        alert("Please Enter a task name.");
+        return;
+    }
+
+    tasks.forEach(function (task) {
+        if (task.id === editingTaskId) {
+            task.name = newTaskName;
+            task.priority = newPriority;
+        }
+    });
+
+    saveTasks();
+    editSection.classList.add("hidden");
+    editingTaskId = null;
+    displayTasks();
+})
+
+
+// Cancel Edit //
+
+cancelEditBtn.addEventListener("click", function () {
+    editSection.classList.add("hidden");
+    editingTaskId = null
+})
 
 function updateStatistics() {
     let totalTasks = tasks.length;
